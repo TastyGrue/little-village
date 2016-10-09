@@ -1,0 +1,11 @@
+﻿The first snowflake of winter lands on a dead leaf.
+A forest fire engulfs the land. Afterwards, small seedlings spring from the ashes.
+Pouring rain masks the world.
+The soft spring shower drizzles budding flowers.
+As night falls, the sky turns to soft shades of purple.
+White snow covers the branches of evergreens.
+Dawn colors the sky in vivid orange and red hues.
+Rustling leaves and creaking branches accompany the howling wind.
+The land shakes violently in an earthquake.
+?<weight >= 45000> You remain in the same spot after the whole ordeal.
+?<weight < 45000> You roll around chaotically until the earthquake stops.
