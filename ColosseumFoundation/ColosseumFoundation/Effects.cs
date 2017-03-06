@@ -25,9 +25,11 @@ namespace ColosseumFoundation
         /// A wrapper method that "ticks" the effect, guarantees lifespan
         /// being expended
         /// </summary>
-        public void Tick()
+        public void Tick(Fighter affected)
         {
             Lifespan--;
+            TickEffect(affected);
+
         }
 
         /// <summary>
@@ -62,13 +64,15 @@ namespace ColosseumFoundation
 
         protected override void TickEffect(Fighter affected)
         {
-            affected.Damage(Strength);
+            ModifierList armorIgnore = new ModifierList();
+            armorIgnore.AddModifier(new DamageModifier(x => x, 10));
+            affected.Damage(Strength,armorIgnore);
         }
     }
 
 
     /// <summary>
-    /// Reduces the chance of success of any move of the victim succeeding to 25%.
+    /// Reduces the chance of success of any move of the victim succeeding by 75%.
     /// </summary>
     public class Blinded : Effect
     {
@@ -79,7 +83,8 @@ namespace ColosseumFoundation
 
         protected override void TickEffect(Fighter affected)
         {
-            
+            Modifier mod = new MoveModifier(x => 0.25 * x, 1);
+            affected.AddModifier(mod, Fighter.Modifications.SelfMove);
         }
     }
 }

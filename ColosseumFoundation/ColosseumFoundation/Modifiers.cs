@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ColosseumFoundation
 {
+    /// <summary>
+    /// An abstract modifier class. Modifiers run algorithm x: input -> x -> output
+    /// </summary>
     public abstract class Modifier : IComparable
     {
         public int Priority { get; protected set; }
@@ -15,7 +19,10 @@ namespace ColosseumFoundation
         public ModifierDelegate Delegate { get; protected set; }
     }
 
-    public class ModifierList
+    /// <summary>
+    /// A list of modifiers
+    /// </summary>
+    public class ModifierList : IEnumerable
     {
         protected List<Modifier> modifiers;
         public int Count
@@ -37,10 +44,10 @@ namespace ColosseumFoundation
         /// </summary>
         public double Calculate(double input)
         {
-            double output = 0;
+            double output = input;
             foreach(Modifier mod in modifiers)
             {
-                output = mod.Delegate(input);
+                output = mod.Delegate(output);
             }
             return output;
         }
@@ -52,12 +59,12 @@ namespace ColosseumFoundation
         /// </summary>
         public double CalculateMin(double input, int minRange)
         {
-            double output = 0;
+            double output = input;
             foreach(Modifier mod in modifiers)
             {
                 if(mod.Priority >= minRange)
                 {
-                    output = mod.Delegate(input);
+                    output = mod.Delegate(output);
                 }
             }
             return output;
@@ -70,12 +77,12 @@ namespace ColosseumFoundation
         /// </summary>
         public double CalculateMax(double input, int maxRange)
         {
-            double output = 0;
+            double output = input;
             foreach (Modifier mod in modifiers)
             {
                 if (mod.Priority < maxRange)
                 {
-                    output = mod.Delegate(input);
+                    output = mod.Delegate(output);
                 }
             }
             return output;
@@ -89,12 +96,12 @@ namespace ColosseumFoundation
         /// </summary>
         public double CalculateRange(double input, int minRange, int maxRange)
         {
-            double output = 0;
+            double output = input;
             foreach (Modifier mod in modifiers)
             {
                 if (mod.Priority < maxRange && mod.Priority >= minRange)
                 {
-                    output = mod.Delegate(input);
+                    output = mod.Delegate(output);
                 }
             }
             return output;
@@ -104,18 +111,41 @@ namespace ColosseumFoundation
         {
             modifiers.Clear();
         }
+
+        public IEnumerator GetEnumerator()
+        {
+            return ((IEnumerable)modifiers).GetEnumerator();
+        }
     }
 
     /// <summary>
     /// Wrapper class for a modifier to modify damage dealt.
     /// Priority takes place in order from lowest to highest.
     /// 
-    /// For convention, pre-armor damage modification is before 0,
-    ///     post-armor damage modification is after 0
+    /// For convention, pre-armor damage modification is before 0 (physical),
+    ///     post-armor damage modification is after 0 (armor-piercing, magical)
     /// </summary>
     public class DamageModifier : Modifier
     {
         public DamageModifier(ModifierDelegate mod, int priority)
+        {
+            Delegate = mod;
+            Priority = priority;
+        }
+
+        public override int CompareTo(object obj)
+        {
+            return Priority.CompareTo(obj);
+        }
+    }
+
+    /// <summary>
+    /// Modifies the percent chance of a success, as represented by a double between 0 and 1,
+    /// with 1 as success and 0 as failure.
+    /// </summary>
+    public class MoveModifier : Modifier
+    {
+        public MoveModifier(ModifierDelegate mod, int priority)
         {
             Delegate = mod;
             Priority = priority;
