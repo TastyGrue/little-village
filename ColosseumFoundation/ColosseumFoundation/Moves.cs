@@ -80,4 +80,22 @@ namespace ColosseumFoundation
             FlatManaCost = manaCost;
         }
     }
+
+    public class Blind : Move
+    {
+        public Blind(Fighter user, Blinded blindEffect, double manaCost) : base(user)
+        {
+            AdditionalReceiverEffects.Add(blindEffect);
+            FlatManaCost = manaCost;
+        }
+    }
+
+    public class Fireball : Move
+    {
+        public Fireball(Fighter user, double manaCost, double strength) : base(user)
+        {
+            user.AddModifier(new DamageModifier(x => x + strength, 1),Fighter.Modifications.OutDamage);
+            FlatManaCost = manaCost;
+        }
+    }
 }

@@ -163,7 +163,7 @@ namespace ColosseumFoundation
         /// <summary>
         /// Expend the mana cost for the move, and applies user effects
         /// </summary>
-        public void PerformMove(Move m)
+        public bool PerformMove(Move m)
         {
             Mana -= m.FlatManaCost;
 
@@ -172,7 +172,7 @@ namespace ColosseumFoundation
             chance = SelfMoveModifiers.Calculate(chance);
 
             if (FighterRNG.NextDouble() > chance)
-                return;
+                return false;
 
             if (m.AdditionalUserEffects.Count != 0)
             {
@@ -181,6 +181,8 @@ namespace ColosseumFoundation
                     AddEffect(e);
                 }
             }
+
+            return true;
         }
 
         /// <summary>
