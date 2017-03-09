@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColosseumFoundation", "Colo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserView", "UserView\UserView.csproj", "{41D5A562-2199-4BDB-8E26-7EC26CF0B333}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C4E79ED5-BE29-4344-8BF5-8353A1A88AEC}"
+	ProjectSection(SolutionItems) = preProject
+		devnotes.txt = devnotes.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

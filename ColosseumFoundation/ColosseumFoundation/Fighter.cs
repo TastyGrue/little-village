@@ -15,10 +15,10 @@ namespace ColosseumFoundation
 
         public Fighter(double totalHealth, double totalMana, double totalSpeed, List<Move> moves)
         {
-            Health = totalHealth;
-            Mana = totalMana;
-            Speed = totalSpeed;
-            moves = new List<Move> { new Attack(this) };
+            Health = ( MaxHealth = totalHealth );
+            Mana = (MaxMana = totalMana);
+            Speed = (MaxSpeed = totalSpeed);
+            moves = new List<Move> { new Attack(this, 20) };
         }
 
         /// <summary>
@@ -32,14 +32,29 @@ namespace ColosseumFoundation
         public double Health { get; protected set; }
 
         /// <summary>
+        /// The maximum health of the fighter
+        /// </summary>
+        public double MaxHealth { get; protected set; }
+
+        /// <summary>
         /// The mana of the fighter; spent when doing special moves. Regenerates.
         /// </summary>
         public double Mana { get; protected set; }
 
         /// <summary>
+        /// The maximum mana of the fighter
+        /// </summary>
+        public double MaxMana { get; protected set; }
+
+        /// <summary>
         /// The speed of the fighter.
         /// </summary>
         public double Speed { get; protected set; }
+
+        /// <summary>
+        /// Maximum speed of the fighter
+        /// </summary>
+        public double MaxSpeed { get; protected set; }
 
         /// <summary>
         /// How much mana the fighter regenerates per turn.
@@ -116,8 +131,7 @@ namespace ColosseumFoundation
             damage = DamageModifiers.CalculateMax(damage, 0);
             Tuple<double, double> pair = SpeedDamage(damage);
             Speed -= pair.Item2;
-            HealthDamage(pair.Item1);
-            damage = DamageModifiers.CalculateMin(damage, 0);
+            damage = DamageModifiers.CalculateMin(pair.Item1, 0) ;
             HealthDamage(damage);
             DamageModifiers.Clear();
         }
@@ -128,6 +142,14 @@ namespace ColosseumFoundation
         virtual public void ManaUpdate()
         {
             Mana = Mana + RegenerationRate;
+        }
+
+        /// <summary>
+        /// Refills speed
+        /// </summary>
+        virtual public void SpeedUpdate()
+        {
+            Speed = MaxSpeed;
         }
 
         /// <summary>

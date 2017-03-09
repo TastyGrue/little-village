@@ -1,0 +1,11 @@
+Created by Adam Ebling, 2017
+
+Regarding Damage Modifier Priority:
+
+-3 is for very slow blows: takes little skill to avoid
+-2 is for normal strikes: takes some skill to avoid
+-1 is for slow projectiles and quick strikes: can be avoided with skill
+0 is for fast projectiles and lightning-fast strikes: normally unavoidable
+1 is for blinking fast projectiles: incredibly unavoidable
+2 is for linked attacks: requires substantial unhuman skill to avoid
+3 is for fuck you.

@@ -17,9 +17,9 @@ namespace ColosseumFoundation
         public Move(Fighter user)
         {
             User = user;
-            FlatDamage = 0;
-            FlatDefense = 0;
+            AIDamage = 0;
             FlatManaCost = 0;
+            FlatSpeedCost = 0;
         }
 
         /// <summary>
@@ -31,13 +31,7 @@ namespace ColosseumFoundation
         /// The expected damage of the move, assuming an enemy defense of 0 and no modifiers
         /// Used for Artificial Intelligence
         /// </summary>
-        public double FlatDamage { get; protected set; }
-
-        /// <summary>
-        /// The expected maximum defense, i.e. the amount of damage that will be prevented
-        /// Used for Artificial Intelligence
-        /// </summary>
-        public double FlatDefense { get; protected set; }
+        public double AIDamage { get; protected set; }
 
         /// <summary>
         /// The expected mana cost of the move
@@ -45,9 +39,15 @@ namespace ColosseumFoundation
         public double FlatManaCost { get; protected set; }
 
         /// <summary>
-        /// A list of delegates that determines additional effects on the user of the move
+        /// The expected speed cost of the move
         /// </summary>
-        public List<Effect> AdditionalUserEffects;
+        public double FlatSpeedCost { get; protected set; }
+
+        /// <summary>
+        /// A list of delegates that determines additional effects on the user of the move.
+        /// The boolean determines whether the user triggers the effect instantly (true) or afterwards (false).
+        /// </summary>
+        public List<Tuple<bool,Effect>> AdditionalUserEffects;
 
         /// <summary>
         /// A list of delegates that determines additional effects on the receiver of the move
@@ -57,38 +57,40 @@ namespace ColosseumFoundation
 
     public class Attack : Move
     {
-        public Attack(Fighter user) : base(user)
+        public Attack(Fighter user, double speedCost) : base(user)
         {
-            FlatDamage = User.Strength;
+            AIDamage = User.Strength;
         }
     }
 
     public class Poison : Move
     {
-        public Poison(Fighter user, Poisoned poisonEffect, double manaCost) : base(user)
+        public Poison(Fighter user, Poisoned poisonEffect, double baseManaCost, double baseSpeedCost) : base(user)
         {
-            FlatDamage = (poisonEffect.Lifespan) * poisonEffect.Strength;
+            AIDamage = (poisonEffect.Lifespan) * poisonEffect.Strength;
             AdditionalReceiverEffects.Add(poisonEffect);
-            FlatManaCost = manaCost;
+            FlatManaCost = baseManaCost;
+            FlatSpeedCost = baseSpeedCost;
         }
     }
 
     public class Blind : Move
     {
-        public Blind(Fighter user, Blinded blindEffect, double manaCost) : base(user)
+        public Blind(Fighter user, Blinded blindEffect, double baseManaCost, double baseSpeedCost) : base(user)
         {
             AdditionalReceiverEffects.Add(blindEffect);
-            FlatManaCost = manaCost;
+            FlatManaCost = baseManaCost;
+            FlatSpeedCost = baseSpeedCost;
         }
     }
 
     public class Fireball : Move
     {
-        public Fireball(Fighter user, double manaCost, double strength) : base(user)
+        public Fireball(Fighter user, double baseManaCost, double potency) : base(user)
         {
-            user.AddModifier(new DamageModifier(x => x + strength, 1),Fighter.Modifications.OutDamage);
-            FlatDamage = strength;
-            FlatManaCost = manaCost;
+            user.AddModifier(new DamageModifier(x => x + potency, 0),Fighter.Modifications.OutDamage);
+            AIDamage = potency;
+            FlatManaCost = baseManaCost;
         }
     }
 }
