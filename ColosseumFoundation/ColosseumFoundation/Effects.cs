@@ -64,9 +64,9 @@ namespace ColosseumFoundation
 
         protected override void TickEffect(Fighter affected)
         {
-            ModifierList armorIgnore = new ModifierList();
-            armorIgnore.AddModifier(new DamageModifier(x => x, 10));
-            affected.Damage(Strength,armorIgnore);
+            ModifierList speedIgnore = new ModifierList();
+            speedIgnore.AddModifier(new DamageModifier(x => x, 10));
+            affected.Damage(Strength,speedIgnore);
         }
     }
 

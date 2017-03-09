@@ -13,12 +13,12 @@ namespace ColosseumFoundation
     {
         public enum Modifications { SelfDamage = 1, SelfMove, OutDamage }
 
-        public Fighter(double health, double mana, double armor, List<Move> moves)
+        public Fighter(double totalHealth, double totalMana, double totalSpeed, List<Move> moves)
         {
-            Health = health;
-            Mana = mana;
-            Armor = armor;
-            moves = new List<Move> { new Attack(this), new Block(this) };
+            Health = totalHealth;
+            Mana = totalMana;
+            Speed = totalSpeed;
+            moves = new List<Move> { new Attack(this) };
         }
 
         /// <summary>
@@ -37,10 +37,9 @@ namespace ColosseumFoundation
         public double Mana { get; protected set; }
 
         /// <summary>
-        /// The armor of the fighter. Expended when the fighter uses block, and blocks an attack,
-        /// and when the fighter receives physical damage.
+        /// The speed of the fighter.
         /// </summary>
-        public double Armor { get; protected set; }
+        public double Speed { get; protected set; }
 
         /// <summary>
         /// How much mana the fighter regenerates per turn.
@@ -54,21 +53,20 @@ namespace ColosseumFoundation
 
         /// <summary>
         /// Calculates damage to the fighter based on the fighter's armor.
-        /// Returns a tuple (HealthDamage, Armor Damage)
+        /// Returns a tuple (Health Damage, Speed Damage)
         /// </summary>
         /// <param name="damage"></param>
         /// <returns>HealthDMG,ArmorDMG</returns>
-        virtual public Tuple<double, double> ArmorDamage(double damage)
+        virtual public Tuple<double, double> SpeedDamage(double damage)
         {
-            double halfDamage = 0.5 * damage;
-            double armorDamage = 0.375 * halfDamage;
-            if (armorDamage > Armor)
+            double speedDamage = 1.5 * damage;
+            double overflow = 0;
+            if (speedDamage > Speed)
             {
-                double overflow = (armorDamage - Armor) / 0.375;
-                damage = halfDamage + armorDamage;
-                armorDamage = Armor;
+                overflow = (speedDamage - Speed) / 1.5;
+                speedDamage = Speed;
             }
-            return new Tuple<double, double>(damage, armorDamage);
+            return new Tuple<double, double>(overflow, speedDamage);
         }
 
         /// <summary>
@@ -116,8 +114,9 @@ namespace ColosseumFoundation
                 DamageModifiers.AddModifier(mod);
             }
             damage = DamageModifiers.CalculateMax(damage, 0);
-            Tuple<double, double> pair = ArmorDamage(damage);
-            Armor -= pair.Item2;
+            Tuple<double, double> pair = SpeedDamage(damage);
+            Speed -= pair.Item2;
+            HealthDamage(pair.Item1);
             damage = DamageModifiers.CalculateMin(damage, 0);
             HealthDamage(damage);
             DamageModifiers.Clear();

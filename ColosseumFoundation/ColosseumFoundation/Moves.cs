@@ -55,14 +55,6 @@ namespace ColosseumFoundation
         public List<Effect> AdditionalReceiverEffects;
     }
 
-    public class Block : Move
-    {
-        public Block(Fighter user) : base(user)
-        {
-            FlatDefense = user.Armor;
-        }
-    }
-
     public class Attack : Move
     {
         public Attack(Fighter user) : base(user)
@@ -95,6 +87,7 @@ namespace ColosseumFoundation
         public Fireball(Fighter user, double manaCost, double strength) : base(user)
         {
             user.AddModifier(new DamageModifier(x => x + strength, 1),Fighter.Modifications.OutDamage);
+            FlatDamage = strength;
             FlatManaCost = manaCost;
         }
     }

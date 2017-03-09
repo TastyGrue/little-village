@@ -122,8 +122,8 @@ namespace ColosseumFoundation
     /// Wrapper class for a modifier to modify damage dealt.
     /// Priority takes place in order from lowest to highest.
     /// 
-    /// For convention, pre-armor damage modification is before 0 (physical),
-    ///     post-armor damage modification is after 0 (armor-piercing, magical)
+    /// For convention, pre-evade damage modification is before 0 (physical, projectile),
+    ///     post-evade damage modification is after 0 (armor-piercing, unavoidable)
     /// </summary>
     public class DamageModifier : Modifier
     {
