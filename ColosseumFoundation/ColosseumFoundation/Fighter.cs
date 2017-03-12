@@ -11,8 +11,6 @@ namespace ColosseumFoundation
     /// </summary>
     public abstract class Fighter
     {
-        public enum Modifications { SelfDamage = 1, SelfMove, OutDamage }
-
         public Fighter(double totalHealth, double totalMana, double totalSpeed, List<Move> moves)
         {
             Health = ( MaxHealth = totalHealth );
@@ -67,7 +65,7 @@ namespace ColosseumFoundation
         public double Strength { get; protected set; }
 
         /// <summary>
-        /// Calculates damage to the fighter based on the fighter's armor.
+        /// Calculates damage to the fighter based on the fighter's available speed.
         /// Returns a tuple (Health Damage, Speed Damage)
         /// </summary>
         /// <param name="damage"></param>
@@ -87,7 +85,7 @@ namespace ColosseumFoundation
         /// <summary>
         /// A list of effects that are applied to the fighter when the fighter updates.
         /// </summary>
-        protected List<Effect> FighterEffects = new List<Effect>();
+        protected List<ActiveEffect> FighterEffects = new List<ActiveEffect>();
 
         /// <summary>
         /// A list of a fighter's available moves
@@ -98,17 +96,17 @@ namespace ColosseumFoundation
         /// A list of modifiers this fighter applies to damage directed
         /// at them
         /// </summary>
-        protected ModifierList SelfDamageModifiers = new ModifierList();
+        protected PassiveList SelfDamageModifiers = new PassiveList();
 
         /// <summary>
         /// A list of modifiers this fighter applies to any move performed by them
         /// </summary>
-        protected ModifierList SelfMoveModifiers = new ModifierList();
+        protected PassiveList SelfMoveModifiers = new PassiveList();
 
         /// <summary>
         /// A list of damage modifiers this fighter applies to damage dealt
         /// </summary>
-        protected ModifierList OutDamageModifiers = new ModifierList();
+        protected PassiveList OutDamageModifiers = new PassiveList();
 
         /// <summary>
         /// Deal flat damage to the fighter, health -= damage
@@ -120,20 +118,33 @@ namespace ColosseumFoundation
 
         /// <summary>
         /// Damage the fighter applying damage modifiers (on both fighter and attacker)
-        /// to the damage. CLEARS DamageModifiers
+        /// to the damage. 
         /// </summary>
-        public void Damage(double damage, ModifierList DamageModifiers)
+        public void Damage(double damage, PassiveList DamageModifiers)
         {
-            foreach (Modifier mod in SelfDamageModifiers)
+            PassiveList DamageModifierClone = (PassiveList)DamageModifiers.Clone();
+
+            foreach (PassiveEffect mod in SelfDamageModifiers)
             {
-                DamageModifiers.AddModifier(mod);
+                DamageModifierClone.Add(mod);
             }
-            damage = DamageModifiers.CalculateMax(damage, 0);
+            damage = DamageModifierClone.CalculateMax(damage, 0);
             Tuple<double, double> pair = SpeedDamage(damage);
             Speed -= pair.Item2;
-            damage = DamageModifiers.CalculateMin(pair.Item1, 0) ;
+            damage = DamageModifierClone.CalculateMin(pair.Item1, 0) ;
             HealthDamage(damage);
-            DamageModifiers.Clear();
+        }
+
+        /// <summary>
+        /// Damage the fighter directly, using only the fighter's own damage modifiers
+        /// </summary>
+        public void Damage(double damage)
+        {
+            damage = SelfDamageModifiers.CalculateMax(damage, 0);
+            Tuple<double, double> pair = SpeedDamage(damage);
+            Speed -= pair.Item2;
+            damage = SelfDamageModifiers.CalculateMin(pair.Item1, 0);
+            HealthDamage(damage);
         }
 
         /// <summary>
@@ -159,14 +170,10 @@ namespace ColosseumFoundation
         /// </summary>
         virtual public void EffectUpdate()
         {
-            OutDamageModifiers.Clear();
-            SelfDamageModifiers.Clear();
-            SelfMoveModifiers.Clear();
-
-            List<Effect> ExpiredEffects = new List<Effect>();
-            foreach (Effect e in FighterEffects)
+            List<ActiveEffect> ExpiredEffects = new List<ActiveEffect>();
+            foreach (ActiveEffect e in FighterEffects)
             {
-                e.Tick(this);
+                e.Tick();
 
                 if (e.Lifespan <= 0)
                 {
@@ -175,7 +182,7 @@ namespace ColosseumFoundation
                 }
             }
 
-            foreach (Effect e in ExpiredEffects)
+            foreach (ActiveEffect e in ExpiredEffects)
             {
                 FighterEffects.Remove(e);
             }
@@ -186,7 +193,22 @@ namespace ColosseumFoundation
         /// </summary>
         public bool PerformMove(Move m)
         {
+            if (m.AdditionalUserEffects.Count != 0)
+            {
+                foreach (Effect e in m.AdditionalUserEffects)
+                {
+                    if(e.InitialCalculationBoolean)
+                    {
+                        if (e is PassiveEffect && ((PassiveEffect)e).IOType == PassiveEffect.ModType.Move)
+                        {
+                            SelfMoveModifiers.Add((PassiveEffect)e);
+                        }
+                    }
+                }
+            }
+
             Mana -= m.FlatManaCost;
+            Speed -= m.FlatSpeedCost;
 
             double chance = 1;
 
@@ -194,14 +216,6 @@ namespace ColosseumFoundation
 
             if (FighterRNG.NextDouble() > chance)
                 return false;
-
-            if (m.AdditionalUserEffects.Count != 0)
-            {
-                foreach (Effect e in m.AdditionalUserEffects)
-                {
-                    AddEffect(e);
-                }
-            }
 
             return true;
         }
@@ -217,22 +231,9 @@ namespace ColosseumFoundation
         /// <summary>
         /// Adds a modifier to the fighter
         /// </summary>
-        public void AddModifier(Modifier mod, Modifications m)
+        public void AddEffect(Effect mod)
         {
-            switch (m)
-            {
-                case Modifications.SelfDamage:
-                    SelfDamageModifiers.AddModifier(mod);
-                    break;
 
-                case Modifications.SelfMove:
-                    SelfMoveModifiers.AddModifier(mod);
-                    break;
-
-                case Modifications.OutDamage:
-                    OutDamageModifiers.AddModifier(mod);
-                    break;
-            }
         }
     }
 

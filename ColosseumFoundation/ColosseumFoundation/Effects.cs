@@ -7,36 +7,55 @@ using System.Threading.Tasks;
 namespace ColosseumFoundation
 {
     /// <summary>
-    /// Effects affect fighters for a set amount of turns, and perfrom small
-    /// actions every turn with Tick().
+    /// Effects affect fighters for a set amount of ticks, and perfrom small
+    /// actions every tick with Tick().
     /// </summary>
     public abstract class Effect
     {
         /// <summary>
-        /// Constructor for Effect, takes the fighter affected by the effect, 
-        /// and how many turns the effect will last
+        /// Constructor for Effect, takes the lifespan of the effect and defines
+        /// InitPreCalcDmg.
         /// </summary>
-        public Effect(int lifespan)
+        public Effect(int lifespan, bool InitialCalculationBoolean)
         {
             Lifespan = lifespan;
+            this.InitialCalculationBoolean = InitialCalculationBoolean;
+        }
+
+        /// <summary>
+        /// Whether this effect, when it is initially applied to a fighter, should be
+        /// applied before (true) or after (false) damage and move success is calculated.
+        /// </summary>
+        public bool InitialCalculationBoolean { get; }
+
+        protected Fighter affected = null;
+
+        /// <summary>
+        /// Attaches a fighter to the effect. Returns false if the fighter is not
+        /// successfully attached.
+        /// </summary>
+        public bool AttachFighter(Fighter fighter)
+        {
+            if (affected == null)
+            {
+                affected = fighter;
+                return true;
+            }
+            else
+            {
+                return affected == fighter;
+            }
         }
 
         /// <summary>
         /// A wrapper method that "ticks" the effect, guarantees lifespan
-        /// being expended
+        /// being expended.
         /// </summary>
-        public void Tick(Fighter affected)
+        public virtual void Tick()
         {
-            Lifespan--;
-            TickEffect(affected);
-
+            if (affected != null)
+                Lifespan--;
         }
-
-        /// <summary>
-        /// The actual effect's tick. This is where all adjustments and
-        /// actions on affected fighter occur
-        /// </summary>
-        abstract protected void TickEffect(Fighter affected);
 
         /// <summary>
         /// The number of turns that an effect lasts.
@@ -44,47 +63,23 @@ namespace ColosseumFoundation
         public int Lifespan;
     }
 
-    /// <summary>
-    /// The Poisoned effect damages a victim every turn
-    /// </summary>
-    public class Poisoned : Effect
+    public abstract class ActiveEffect : Effect
     {
-        /// <summary>
-        /// Damages a victim's health directly every turn by the strength.
-        /// </summary>
-        public Poisoned(int lifespan, double strength) : base(lifespan)
+        public ActiveEffect(int lifespan, bool initCalcBool) : base(lifespan, initCalcBool)
         {
-            Strength = strength;
+        }
+
+        public override void Tick()
+        {
+            base.Tick();
+            if(affected != null)
+                TickEffect();
         }
 
         /// <summary>
-        /// The strength of the poison, how much damage is dealt each turn
+        /// The actual effect's tick. This is where all adjustments and
+        /// actions on affected fighter occur.
         /// </summary>
-        public double Strength { get; protected set; }
-
-        protected override void TickEffect(Fighter affected)
-        {
-            ModifierList speedIgnore = new ModifierList();
-            speedIgnore.AddModifier(new DamageModifier(x => x, 10));
-            affected.Damage(Strength,speedIgnore);
-        }
-    }
-
-
-    /// <summary>
-    /// Reduces the chance of success of any move of the victim succeeding by 75%.
-    /// </summary>
-    public class Blinded : Effect
-    {
-        public Blinded(int lifespan) : base(lifespan)
-        {
-
-        }
-
-        protected override void TickEffect(Fighter affected)
-        {
-            Modifier mod = new MoveModifier(x => 0.25 * x, 1);
-            affected.AddModifier(mod, Fighter.Modifications.SelfMove);
-        }
+        abstract protected void TickEffect();
     }
 }

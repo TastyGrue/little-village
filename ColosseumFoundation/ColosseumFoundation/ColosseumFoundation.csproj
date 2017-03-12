@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="Fighter.cs" />
     <Compile Include="Effects.cs" />
-    <Compile Include="Modifiers.cs" />
+    <Compile Include="PassiveEffects.cs" />
     <Compile Include="Moves.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

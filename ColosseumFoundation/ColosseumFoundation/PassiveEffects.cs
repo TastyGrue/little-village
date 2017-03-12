@@ -1,41 +1,53 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ColosseumFoundation
 {
-    /// <summary>
-    /// An abstract modifier class. Modifiers run algorithm x: input -> x -> output
-    /// </summary>
-    public abstract class Modifier : IComparable
+    public abstract class PassiveEffect : Effect, IComparable
     {
+        public PassiveEffect(int priority, int lifespan, bool InitCalcBool) : base(lifespan, InitCalcBool)
+        {
+            Priority = priority;
+        }
+
         public int Priority { get; protected set; }
-        public abstract int CompareTo(object obj);
+
+        public enum ModType { Damage = 1, Move = 2 }
+
+        public ModType IOType { get; protected set; }
 
         public delegate double ModifierDelegate(double input);
-        public ModifierDelegate Delegate { get; protected set; }
+        public ModifierDelegate modDelegate { get; protected set; }
+
+        public int CompareTo(object obj)
+        {
+            return Priority.CompareTo(obj);
+        }
     }
 
+
     /// <summary>
-    /// A list of modifiers
+    /// A list of passive effects
     /// </summary>
-    public class ModifierList : IEnumerable
+    public class PassiveList : IEnumerable, ICloneable
     {
-        protected List<Modifier> modifiers;
+        protected List<PassiveEffect> modifiers;
         public int Count
         {
             get
             {
-               return modifiers.Count;
+                return modifiers.Count;
             }
         }
 
-        public void AddModifier(Modifier mod)
+        public void Add(PassiveEffect PE)
         {
-            modifiers.Add(mod);
+            modifiers.Add(PE);
             modifiers.Sort();
         }
 
@@ -45,9 +57,9 @@ namespace ColosseumFoundation
         public double Calculate(double input)
         {
             double output = input;
-            foreach(Modifier mod in modifiers)
+            foreach (PassiveEffect mod in modifiers)
             {
-                output = mod.Delegate(output);
+                output = mod.modDelegate(output);
             }
             return output;
         }
@@ -60,11 +72,11 @@ namespace ColosseumFoundation
         public double CalculateMin(double input, int minRange)
         {
             double output = input;
-            foreach(Modifier mod in modifiers)
+            foreach (PassiveEffect mod in modifiers)
             {
-                if(mod.Priority >= minRange)
+                if (mod.Priority >= minRange)
                 {
-                    output = mod.Delegate(output);
+                    output = mod.modDelegate(output);
                 }
             }
             return output;
@@ -78,11 +90,11 @@ namespace ColosseumFoundation
         public double CalculateMax(double input, int maxRange)
         {
             double output = input;
-            foreach (Modifier mod in modifiers)
+            foreach (PassiveEffect mod in modifiers)
             {
                 if (mod.Priority < maxRange)
                 {
-                    output = mod.Delegate(output);
+                    output = mod.modDelegate(output);
                 }
             }
             return output;
@@ -97,11 +109,11 @@ namespace ColosseumFoundation
         public double CalculateRange(double input, int minRange, int maxRange)
         {
             double output = input;
-            foreach (Modifier mod in modifiers)
+            foreach (PassiveEffect mod in modifiers)
             {
                 if (mod.Priority < maxRange && mod.Priority >= minRange)
                 {
-                    output = mod.Delegate(output);
+                    output = mod.modDelegate(output);
                 }
             }
             return output;
@@ -116,44 +128,20 @@ namespace ColosseumFoundation
         {
             return ((IEnumerable)modifiers).GetEnumerator();
         }
-    }
 
-    /// <summary>
-    /// Wrapper class for a modifier to modify damage dealt.
-    /// Priority takes place in order from lowest to highest.
-    /// 
-    /// For convention, pre-evade damage modification is before 0 (physical, projectile),
-    ///     post-evade damage modification is after 0 (armor-piercing, unavoidable)
-    /// </summary>
-    public class DamageModifier : Modifier
-    {
-        public DamageModifier(ModifierDelegate mod, int priority)
+        /// <summary>
+        /// Shallow clone
+        /// </summary>
+        public object Clone()
         {
-            Delegate = mod;
-            Priority = priority;
-        }
+            PassiveList output = new PassiveList();
 
-        public override int CompareTo(object obj)
-        {
-            return Priority.CompareTo(obj);
-        }
-    }
+            foreach(PassiveEffect PE in modifiers)
+            {
+                output.Add(PE);
+            }
 
-    /// <summary>
-    /// Modifies the percent chance of a success, as represented by a double between 0 and 1,
-    /// with 1 as success and 0 as failure.
-    /// </summary>
-    public class MoveModifier : Modifier
-    {
-        public MoveModifier(ModifierDelegate mod, int priority)
-        {
-            Delegate = mod;
-            Priority = priority;
-        }
-
-        public override int CompareTo(object obj)
-        {
-            return Priority.CompareTo(obj);
+            return output;
         }
     }
 }
