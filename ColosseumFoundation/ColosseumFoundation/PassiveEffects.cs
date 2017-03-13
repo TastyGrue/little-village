@@ -17,7 +17,7 @@ namespace ColosseumFoundation
 
         public int Priority { get; protected set; }
 
-        public enum ModType { Damage = 1, Move = 2 }
+        public enum ModType { Weakness = 1, Move = 2, Buff = 3 }
 
         public ModType IOType { get; protected set; }
 

@@ -29,10 +29,9 @@ namespace ColosseumFoundation
         public Fighter User { get; protected set; }
 
         /// <summary>
-        /// A predicted damage value of the move.
-        /// Used for Artificial Intelligence.
+        /// An initial damage value of the move.
         /// </summary>
-        public double AIDamage { get; protected set; }
+        public double FlatDamage { get; protected set; }
 
         /// <summary>
         /// The expected mana cost of the move

@@ -11,12 +11,12 @@ namespace ColosseumFoundation
     /// </summary>
     public abstract class Fighter
     {
-        public Fighter(double totalHealth, double totalMana, double totalSpeed, List<Move> moves)
+        public Fighter(double totalHealth, double totalMana, double totalSpeed)
         {
-            Health = ( MaxHealth = totalHealth );
+            Health = (MaxHealth = totalHealth);
             Mana = (MaxMana = totalMana);
             Speed = (MaxSpeed = totalSpeed);
-            moves = new List<Move> { new Attack(this, 20) };
+            AvailableMoves = new List<Move> { new Attack(this, 10) };
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace ColosseumFoundation
             damage = DamageModifierClone.CalculateMax(damage, 0);
             Tuple<double, double> pair = SpeedDamage(damage);
             Speed -= pair.Item2;
-            damage = DamageModifierClone.CalculateMin(pair.Item1, 0) ;
+            damage = DamageModifierClone.CalculateMin(pair.Item1, 0);
             HealthDamage(damage);
         }
 
@@ -189,15 +189,75 @@ namespace ColosseumFoundation
         }
 
         /// <summary>
+        /// Processes a moveset performed by this fighter
+        /// </summary>
+        public void ProcessMoveset(Moveset Actions)
+        {
+            Tuple<Move,Fighter>[] actions = Actions.Moves;
+            
+            foreach(Tuple<Move,Fighter> act in actions)
+            {
+                // If the move is successful
+                if(PerformMove(act.Item1))
+                {
+                    // Add the effects of the move to the user
+                    foreach(Effect e in act.Item1.AdditionalUserEffects)
+                    {
+                        this.AddEffect(e);
+                    }
+
+                    // Execute the move on target
+                    act.Item2.ReceiveMove(act.Item1.AdditionalReceiverEffects, OutDamageModifiers, act.Item1.FlatDamage);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process a move this fighter is the target of.
+        /// </summary>
+        protected void ReceiveMove(List<Effect> ReceivedEffects, PassiveList DamagingMods, double initDmg)
+        {
+            // Add pertinent pre-damage modifiers
+            foreach(Effect e in ReceivedEffects)
+            {
+                if(e.InitialCalculationBoolean == true)
+                {
+                    if(e is PassiveEffect)
+                    {
+                        switch(((PassiveEffect)e).IOType)
+                        {
+                            case PassiveEffect.ModType.Weakness:
+                                SelfDamageModifiers.Add((PassiveEffect)e);
+                                break;
+                            case PassiveEffect.ModType.Buff:
+                                SelfDamageModifiers.Add((PassiveEffect)e);
+                                break;
+                            case PassiveEffect.ModType.Move:
+                                SelfMoveModifiers.Add((PassiveEffect)e);
+                                break;
+                        }
+                    }
+                }
+            }
+
+            Damage(initDmg, DamagingMods);
+
+            foreach(Effect e in ReceivedEffects)
+            {
+                AddEffect(e);
+            }
+        }
+
+        /// <summary>
         /// Expend the mana cost for the move, and applies user effects
         /// </summary>
-        public bool PerformMove(Move m)
+        protected bool PerformMove(Move m)
         {
             if (m.AdditionalUserEffects.Count != 0)
             {
                 foreach (Effect e in m.AdditionalUserEffects)
                 {
-                    if(e.InitialCalculationBoolean)
+                    if (e.InitialCalculationBoolean)
                     {
                         if (e is PassiveEffect && ((PassiveEffect)e).IOType == PassiveEffect.ModType.Move)
                         {
@@ -221,19 +281,88 @@ namespace ColosseumFoundation
         }
 
         /// <summary>
-        /// Adds an effect to the fighter
+        /// Adds an effect to the fighter, if its InitialCalculationBoolean is false or if it is an active effect
         /// </summary>
-        public void AddEffect(Effect e)
+        public bool AddEffect(Effect e)
         {
-            FighterEffects.Add(e);
+            if(e is ActiveEffect)
+            {
+                FighterEffects.Add((ActiveEffect)e);
+                return true;
+            }
+            else if(e is PassiveEffect && !e.InitialCalculationBoolean)
+            {
+                if(((PassiveEffect)e).IOType == PassiveEffect.ModType.Weakness)
+                {
+                    SelfDamageModifiers.Add((PassiveEffect)e);
+                    return true;
+                }
+                else if (((PassiveEffect)e).IOType == PassiveEffect.ModType.Move)
+                {
+                    SelfMoveModifiers.Add((PassiveEffect)e);
+                    return true;
+                }
+                else if (((PassiveEffect)e).IOType == PassiveEffect.ModType.Buff)
+                {
+                    OutDamageModifiers.Add((PassiveEffect)e);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public class Moveset
+    {
+        public Tuple<Move,Fighter>[] Moves
+        {
+            get
+            {
+                Tuple<Move,Fighter>[] output = new Tuple<Move,Fighter>[moves.Count];
+                moves.CopyTo(output, 0);
+                return output;
+            }
         }
 
-        /// <summary>
-        /// Adds a modifier to the fighter
-        /// </summary>
-        public void AddEffect(Effect mod)
-        {
+        Stack<Tuple<Move,Fighter>> moves;
 
+        double Speed;
+
+        public Moveset(double AvailableSpeed)
+        {
+            Speed = AvailableSpeed;
+        }
+
+        public bool Push(Tuple<Move,Fighter> moveTuple)
+        {
+            double usedSpeed = 0;
+            foreach (Tuple<Move,Fighter> tup in moves)
+            {
+                usedSpeed += tup.Item1.FlatSpeedCost;
+            }
+
+            if (moveTuple.Item1.FlatSpeedCost + usedSpeed > Speed)
+            {
+                return false;
+            }
+            else
+            {
+                moves.Push(moveTuple);
+                return true;
+            }
+        }
+
+        public bool Pop()
+        {
+            if (moves.Count != 0)
+            {
+                moves.Pop();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
