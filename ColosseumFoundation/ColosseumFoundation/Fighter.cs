@@ -11,11 +11,12 @@ namespace ColosseumFoundation
     /// </summary>
     public abstract class Fighter
     {
-        public Fighter(double totalHealth, double totalMana, double totalSpeed)
+        public Fighter(double totalHealth, double totalMana, double totalSpeed, double strength)
         {
             Health = (MaxHealth = totalHealth);
             Mana = (MaxMana = totalMana);
             Speed = (MaxSpeed = totalSpeed);
+            Strength = strength;
             AvailableMoves = new List<Move> { new Attack(this, 10) };
         }
 
@@ -218,25 +219,23 @@ namespace ColosseumFoundation
         protected void ReceiveMove(List<Effect> ReceivedEffects, PassiveList DamagingMods, double initDmg)
         {
             // Add pertinent pre-damage modifiers
-            foreach(Effect e in ReceivedEffects)
+            foreach(PassiveEffect e in ReceivedEffects)
             {
                 if(e.InitialCalculationBoolean == true)
                 {
-                    if(e is PassiveEffect)
-                    {
                         switch(((PassiveEffect)e).IOType)
                         {
                             case PassiveEffect.ModType.Weakness:
-                                SelfDamageModifiers.Add((PassiveEffect)e);
+                                SelfDamageModifiers.Add(e);
                                 break;
                             case PassiveEffect.ModType.Buff:
-                                SelfDamageModifiers.Add((PassiveEffect)e);
+                                SelfDamageModifiers.Add(e);
                                 break;
                             case PassiveEffect.ModType.Move:
-                                SelfMoveModifiers.Add((PassiveEffect)e);
+                                SelfMoveModifiers.Add(e);
                                 break;
                         }
-                    }
+                    
                 }
             }
 
@@ -255,13 +254,13 @@ namespace ColosseumFoundation
         {
             if (m.AdditionalUserEffects.Count != 0)
             {
-                foreach (Effect e in m.AdditionalUserEffects)
+                foreach (PassiveEffect e in m.AdditionalUserEffects)
                 {
                     if (e.InitialCalculationBoolean)
                     {
-                        if (e is PassiveEffect && ((PassiveEffect)e).IOType == PassiveEffect.ModType.Move)
+                        if (e.IOType == PassiveEffect.ModType.Move)
                         {
-                            SelfMoveModifiers.Add((PassiveEffect)e);
+                            SelfMoveModifiers.Add(e);
                         }
                     }
                 }
@@ -290,7 +289,7 @@ namespace ColosseumFoundation
                 FighterEffects.Add((ActiveEffect)e);
                 return true;
             }
-            else if(e is PassiveEffect && !e.InitialCalculationBoolean)
+            else if(e is PassiveEffect && !((PassiveEffect)e).InitialCalculationBoolean)
             {
                 if(((PassiveEffect)e).IOType == PassiveEffect.ModType.Weakness)
                 {
@@ -365,8 +364,4 @@ namespace ColosseumFoundation
             }
         }
     }
-
-
-
-
 }

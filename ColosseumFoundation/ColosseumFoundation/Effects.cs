@@ -16,17 +16,10 @@ namespace ColosseumFoundation
         /// Constructor for Effect, takes the lifespan of the effect and defines
         /// InitPreCalcDmg.
         /// </summary>
-        public Effect(int lifespan, bool InitialCalculationBoolean)
+        public Effect(int lifespan)
         {
             Lifespan = lifespan;
-            this.InitialCalculationBoolean = InitialCalculationBoolean;
         }
-
-        /// <summary>
-        /// Whether this effect, when it is initially applied to a fighter, should be
-        /// applied before (true) or after (false) damage and move success is calculated.
-        /// </summary>
-        public bool InitialCalculationBoolean { get; }
 
         protected Fighter affected = null;
 
@@ -65,7 +58,7 @@ namespace ColosseumFoundation
 
     public abstract class ActiveEffect : Effect
     {
-        public ActiveEffect(int lifespan, bool initCalcBool) : base(lifespan, initCalcBool)
+        public ActiveEffect(int lifespan) : base(lifespan)
         {
         }
 

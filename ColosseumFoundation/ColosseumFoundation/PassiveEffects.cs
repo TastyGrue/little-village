@@ -10,10 +10,17 @@ namespace ColosseumFoundation
 {
     public abstract class PassiveEffect : Effect, IComparable
     {
-        public PassiveEffect(int priority, int lifespan, bool InitCalcBool) : base(lifespan, InitCalcBool)
+        public PassiveEffect(int priority, int lifespan, bool InitCalcBool) : base(lifespan)
         {
             Priority = priority;
+            InitialCalculationBoolean = InitCalcBool;
         }
+
+        /// <summary>
+        /// Whether this effect, when it is initially applied to a fighter, should be
+        /// applied before (true) or after (false) damage and move success is calculated.
+        /// </summary>
+        public bool InitialCalculationBoolean { get; }
 
         public int Priority { get; protected set; }
 
@@ -30,6 +37,13 @@ namespace ColosseumFoundation
         }
     }
 
+    public class QuickProjectile : PassiveEffect
+    {
+        public QuickProjectile(double strength) : base(1,0,true)
+        {
+            modDelegate = x => x + strength;
+        }
+    }
 
     /// <summary>
     /// A list of passive effects

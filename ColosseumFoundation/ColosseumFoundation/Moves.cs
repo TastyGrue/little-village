@@ -15,18 +15,24 @@ namespace ColosseumFoundation
         /// <summary>
         /// The base constructor for Move
         /// </summary>
-        public Move(Fighter user)
+        public Move(Fighter user, double SpeedCost)
         {
             User = user;
-            AIDamage = 0;
+            FlatDamage = 0;
             FlatManaCost = 0;
-            FlatSpeedCost = 0;
+            FlatSpeedCost = SpeedCost;
+            Name = GetType().ToString();
         }
 
         /// <summary>
         /// The user of the move
         /// </summary>
         public Fighter User { get; protected set; }
+
+        /// <summary>
+        /// The name of the move
+        /// </summary>
+        public String Name { get; protected set; }
 
         /// <summary>
         /// An initial damage value of the move.
@@ -58,9 +64,10 @@ namespace ColosseumFoundation
 
     public class Attack : Move
     {
-        public Attack(Fighter user, double speedCost) : base(user)
+        public Attack(Fighter user, double speedCost) : base(user,speedCost)
         {
-            AIDamage = User.Strength;
+            FlatDamage = User.Strength;
+            Name = "Basic Attack";
         }
     }
 }

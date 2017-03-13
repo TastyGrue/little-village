@@ -8,4 +8,4 @@ Regarding Damage Modifier Priority:
 0 is for fast projectiles and lightning-fast strikes: normally unavoidable
 1 is for blinking fast projectiles: incredibly unavoidable
 2 is for linked attacks: requires substantial unhuman skill to avoid
-3 is for fuck you.
+3 is for modifiers of all attacks
