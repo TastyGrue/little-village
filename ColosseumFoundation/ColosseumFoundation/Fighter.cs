@@ -130,6 +130,7 @@ namespace ColosseumFoundation
                 DamageModifierClone.Add(mod);
             }
             damage = DamageModifierClone.CalculateMax(damage, 0);
+
             Tuple<double, double> pair = SpeedDamage(damage);
             Speed -= pair.Item2;
             damage = DamageModifierClone.CalculateMin(pair.Item1, 0);
@@ -223,7 +224,7 @@ namespace ColosseumFoundation
             {
                 if(e.InitialCalculationBoolean == true)
                 {
-                        switch(((PassiveEffect)e).IOType)
+                        switch(e.IOType)
                         {
                             case PassiveEffect.ModType.Weakness:
                                 SelfDamageModifiers.Add(e);

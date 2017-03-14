@@ -42,6 +42,7 @@ namespace ColosseumFoundation
         public QuickProjectile(double strength) : base(1,0,true)
         {
             modDelegate = x => x + strength;
+            IOType = ModType.Weakness;
         }
     }
 

@@ -44,6 +44,7 @@ namespace ColosseumData
             public Blinded(int priority, int lifespan, bool InitCalcBool, double reductionRatio) : base(priority, lifespan, InitCalcBool)
             {
                 modDelegate = x => x - (x * reductionRatio);
+                IOType = ModType.Move;
             }
         }
     }

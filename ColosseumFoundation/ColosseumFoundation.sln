@@ -5,14 +5,14 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColosseumFoundation", "ColosseumFoundation\ColosseumFoundation.csproj", "{7F284B90-A5EF-40F4-9B74-BF3FB16E8B7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserView", "UserView\UserView.csproj", "{41D5A562-2199-4BDB-8E26-7EC26CF0B333}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C4E79ED5-BE29-4344-8BF5-8353A1A88AEC}"
 	ProjectSection(SolutionItems) = preProject
 		devnotes.txt = devnotes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColosseumData", "ColosseumData\ColosseumData.csproj", "{1112F481-20A4-45E0-9F9C-B8BF118A81E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColosseumGame", "ColosseumGame\ColosseumGame.csproj", "{A9AEA9A5-CB88-41EE-9002-7B198F8543B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +24,14 @@ Global
 		{7F284B90-A5EF-40F4-9B74-BF3FB16E8B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F284B90-A5EF-40F4-9B74-BF3FB16E8B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F284B90-A5EF-40F4-9B74-BF3FB16E8B7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{41D5A562-2199-4BDB-8E26-7EC26CF0B333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{41D5A562-2199-4BDB-8E26-7EC26CF0B333}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{41D5A562-2199-4BDB-8E26-7EC26CF0B333}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{41D5A562-2199-4BDB-8E26-7EC26CF0B333}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1112F481-20A4-45E0-9F9C-B8BF118A81E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1112F481-20A4-45E0-9F9C-B8BF118A81E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1112F481-20A4-45E0-9F9C-B8BF118A81E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1112F481-20A4-45E0-9F9C-B8BF118A81E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9AEA9A5-CB88-41EE-9002-7B198F8543B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9AEA9A5-CB88-41EE-9002-7B198F8543B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9AEA9A5-CB88-41EE-9002-7B198F8543B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9AEA9A5-CB88-41EE-9002-7B198F8543B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
