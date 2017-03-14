@@ -51,7 +51,7 @@ namespace ColosseumFoundation
     /// </summary>
     public class PassiveList : IEnumerable, ICloneable
     {
-        protected List<PassiveEffect> modifiers;
+        protected List<PassiveEffect> modifiers = new List<PassiveEffect>();
         public int Count
         {
             get

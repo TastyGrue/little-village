@@ -331,6 +331,7 @@ namespace ColosseumFoundation
         public Moveset(double AvailableSpeed)
         {
             Speed = AvailableSpeed;
+            moves = new Stack<Tuple<Move, Fighter>>();
         }
 
         public bool Push(Tuple<Move,Fighter> moveTuple)

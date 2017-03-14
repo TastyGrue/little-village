@@ -49,6 +49,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ColosseumData\ColosseumData.csproj">
+      <Project>{1112f481-20a4-45e0-9f9c-b8bf118a81e5}</Project>
+      <Name>ColosseumData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ColosseumFoundation\ColosseumFoundation.csproj">
+      <Project>{7f284b90-a5ef-40f4-9b74-bf3fb16e8b7e}</Project>
+      <Name>ColosseumFoundation</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -22,6 +22,8 @@ namespace ColosseumFoundation
             FlatManaCost = 0;
             FlatSpeedCost = SpeedCost;
             Name = GetType().ToString();
+            AdditionalReceiverEffects = new List<Effect>();
+            AdditionalUserEffects = new List<Effect>();
         }
 
         /// <summary>

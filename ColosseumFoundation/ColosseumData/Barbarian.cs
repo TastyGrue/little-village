@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ColosseumData
 {
-    class Barbarian
+    public class Barbarian
     {
         public class BarbarianFighter : Fighter
         {
